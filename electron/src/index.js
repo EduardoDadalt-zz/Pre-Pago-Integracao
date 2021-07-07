@@ -3,6 +3,11 @@ const { app, BrowserWindow, Tray, Menu } = require("electron");
 const path = require("path");
 const server = require("./server");
 
+require("update-electron-app")({
+  repo: "EduardoDadalt/Pre-Pago-Integracao",
+  logger: require("electron-log"),
+});
+
 if (require("electron-squirrel-startup")) {
   app.quit();
 }
