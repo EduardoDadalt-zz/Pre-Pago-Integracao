@@ -1,0 +1,27 @@
+body,
+html,
+.fullscreen {
+  height: 100%;
+  width: 100%;
+  font-family: "Roboto", sans-serif;
+  font-size: 30px;
+  overflow: hidden;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.online {
+  font-size: 32px;
+  color: forestgreen;
+  font-weight: 700;
+}
+
+.offline {
+  font-size: 32px;
+  color: brown;
+  font-weight: 700;
+}
