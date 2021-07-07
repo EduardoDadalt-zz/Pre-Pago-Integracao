@@ -1,2 +1,2 @@
-# beerpassprepago
+# PrePago
  Beer Pass Pré Pago
