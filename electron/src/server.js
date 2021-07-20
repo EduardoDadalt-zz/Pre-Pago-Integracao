@@ -6,7 +6,11 @@ const { default: axios } = require("axios");
 const CodigoEstabelecimento = "96702534PC23";
 const port = 3040;
 const chaveIntegracao = 9191;
+const log = require("electron-log");
 require("dotenv").config();
+
+console.log = log.log;
+
 const trigger = `
 TRIGGER  MudarCodCliente
    ON  [Cartoes Gerados]
@@ -50,7 +54,7 @@ const server = () => {
   `
     )
     .then((e) => console.log("Criou a Trigger"))
-    .catch((e) => console.log("Falhou"));
+    .catch((e) => console.log("Falhou a trigger"));
   app.use(cors());
   app.use(express.json());
 
@@ -99,6 +103,7 @@ const server = () => {
     });
 
   app.post("/credito/salvar-consumo", (req, res) => {
+    console.log("/credito/salvar-consumo - Iniciado");
     const {
       rfid,
       idProdutoIntegracao,
@@ -164,15 +169,18 @@ const server = () => {
         const json = Object.assign(
           ...(await Promise.all([getEmUso(rfid), getSaldo(rfid)]))
         );
+        console.log("/credito/salvar-consumo - Sucesso" + JSON.stringify(json));
+
         return res.status(200).json(json);
       })
       .catch((e) => {
-        console.log(e);
+        console.log("/credito/salvar-consumo - Erro: " + e);
         return res.status(500).end();
       });
   });
 
   app.post("/credito/bloquear", async (req, res) => {
+    console.log("/credito/bloquear - Iniciado");
     const { rfid } = req.body;
     try {
       if (req.headers?.["chave-integracao"] == chaveIntegracao && rfid) {
@@ -189,29 +197,37 @@ const server = () => {
             Terminal: 1,
             Caixa: 1000,
           });
+          console.log("/credito/bloquear - Sucesso");
           return res.status(200).json({ emUso: true });
         } else return res.status(200).json({ emUso: true });
       } else throw { status: 401 };
     } catch (error) {
+      console.log("/credito/bloquear - Erro: " + JSON.stringify(error));
       return res.status(error?.status ?? 500).end();
     }
   });
 
   app.post("/credito/desbloquear", async (req, res) => {
+    console.log("/credito/desbloquear - Iniciado");
     const { rfid } = req.body;
     try {
       if (req.headers?.["chave-integracao"] == chaveIntegracao && rfid) {
         await database("StatusMesa")
           .where({ Mesa: rfid, Terminal: 1, Caixa: 1000 })
           .del();
+        console.log("/credito/desbloquear - Sucesso");
+
         return res.status(200).json({ emUso: false });
       } else throw { status: 401 };
     } catch (error) {
+      console.log("/credito/desbloquear - Erro: " + JSON.stringify(error));
+
       return res.status(error?.status ?? 500).end();
     }
   });
 
   app.get("/credito/obter-rfid", async (req, res) => {
+    console.log("/credito/obter-rfid - Iniciado");
     try {
       const { rfid } = req.query;
       if (req.headers?.["chave-integracao"] == chaveIntegracao && rfid) {
@@ -233,10 +249,11 @@ const server = () => {
           ...(await Promise.all([emUso, nomeECPF, saldo])),
           { rfid }
         );
-
+        console.log("/credito/obter-rfid - Sucesso" + JSON.stringify(json));
         return res.status(200).json(json);
       } else throw { status: 401 };
     } catch (error) {
+      console.log("/credito/obter-rfid - Erro: " + JSON.stringify(error));
       return res.status(error?.status ?? 500).end();
     }
   });
