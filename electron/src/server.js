@@ -172,8 +172,9 @@ const server = () => {
         Terminal: 1,
         Caixa: 1000,
       });
-      console.log(response.data);
-      if (response?.data?.Sucesso) {
+      console.log(response?.data);
+      console.log(response?.data?.EnviarPedidoResult?.Sucesso);
+      if (response?.data?.EnviarPedidoResult?.Sucesso) {
         const json = Object.assign(
           ...(await Promise.all([getEmUso(rfid), getSaldo(rfid)]))
         );
