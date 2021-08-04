@@ -144,7 +144,7 @@ const server = () => {
               Observacao: "",
               ItensFracao: null,
               ItensAdicionais: [],
-              ValorTotal: valorTransacao,
+              ValorTotal: precoPorlitro * (quantidadeExtraidaMl / 1000),
               ValorDescontoItem: 0,
               ValorServicoItem: 0,
               ValorDescontoComboItem: 0,
