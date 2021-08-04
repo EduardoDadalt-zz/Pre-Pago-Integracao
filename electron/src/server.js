@@ -103,7 +103,7 @@ const server = () => {
         .catch((e) => reject(e));
     });
 
-  app.post("/credito/salvar-consumo", (req, res) => {
+  app.post("/credito/salvar-consumo", async (req, res) => {
     console.log("/credito/salvar-consumo - Iniciado");
     const {
       rfid,
@@ -159,31 +159,32 @@ const server = () => {
         TipoServico: null,
       },
     };
-    axios
-      .post(
+    try {
+      await database("StatusMesa")
+        .where({ Mesa: rfid, Terminal: 1, Caixa: 1000 })
+        .del();
+      const response = await axios.post(
         "http://localhost/IntegracaoPedidosOnlineIntranet/CartaoService.svc/EnviarPedido",
         json
-      )
-      .then(async (e) => {
-        console.log(e.data);
-        if (e.data.Sucesso) {
-          const json = Object.assign(
-            ...(await Promise.all([getEmUso(rfid), getSaldo(rfid)]))
-          );
-          console.log(
-            "/credito/salvar-consumo - Sucesso" + JSON.stringify(json)
-          );
-
-          return res.status(200).json(json);
-        } else {
-          console.log("/credito/salvar-consumo - Erro: " + e);
-          return res.status(500).end();
-        }
-      })
-      .catch((e) => {
-        console.log("/credito/salvar-consumo - Erro: " + e);
-        return res.status(500).end();
+      );
+      database("StatusMesa").insert({
+        Mesa: rfid,
+        Terminal: 1,
+        Caixa: 1000,
       });
+      console.log(response.data);
+      if (response?.data?.Sucesso) {
+        const json = Object.assign(
+          ...(await Promise.all([getEmUso(rfid), getSaldo(rfid)]))
+        );
+        console.log("/credito/salvar-consumo - Sucesso" + JSON.stringify(json));
+
+        return res.status(200).json(json);
+      } else throw response;
+    } catch (error) {
+      console.log("/credito/salvar-consumo - Erro: " + JSON.stringify(error));
+      return res.status(500).end();
+    }
   });
 
   app.post("/credito/bloquear", async (req, res) => {
