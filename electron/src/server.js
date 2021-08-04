@@ -32,7 +32,7 @@ const server = () => {
     connection: {
       server: "localhost",
       user: "sa",
-      password: process.env.password,
+      password: "MISTERCHEFNET",
       database: "MISTERCHEFNET",
       connectTimeout: ms,
       requestTimeout: ms,
@@ -75,9 +75,10 @@ const server = () => {
             FROM Clientes C
             LEFT JOIN [Cartoes Gerados] CG ON CG.[Código Cliente]=C.[Código Cliente]
             LEFT JOIN [Conta Corrente Assinada] CCA ON CCA.[Código Cliente]=c.[Código Cliente]
-            WHERE C.[Código Externo]=${rfid}
+            WHERE C.[Código Externo]=?
             GROUP BY C.[Código Cliente],CCA.[Código Cliente],C.[Código Externo]
-          `
+          `,
+            rfid
           )
           .then((e) => e?.[0]?.saldo ?? 0),
         axios
@@ -165,13 +166,19 @@ const server = () => {
       )
       .then(async (e) => {
         console.log(e.data);
+        if (e.data.Sucesso) {
+          const json = Object.assign(
+            ...(await Promise.all([getEmUso(rfid), getSaldo(rfid)]))
+          );
+          console.log(
+            "/credito/salvar-consumo - Sucesso" + JSON.stringify(json)
+          );
 
-        const json = Object.assign(
-          ...(await Promise.all([getEmUso(rfid), getSaldo(rfid)]))
-        );
-        console.log("/credito/salvar-consumo - Sucesso" + JSON.stringify(json));
-
-        return res.status(200).json(json);
+          return res.status(200).json(json);
+        } else {
+          console.log("/credito/salvar-consumo - Erro: " + e);
+          return res.status(500).end();
+        }
       })
       .catch((e) => {
         console.log("/credito/salvar-consumo - Erro: " + e);

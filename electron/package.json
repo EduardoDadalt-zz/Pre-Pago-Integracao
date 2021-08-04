@@ -1,7 +1,7 @@
 {
   "name": "beerpassprepago",
   "productName": "beerpassprepago",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "My Electron application description",
   "main": "src/index.js",
   "scripts": {
@@ -20,7 +20,9 @@
   "license": "MIT",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "asar": true
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",

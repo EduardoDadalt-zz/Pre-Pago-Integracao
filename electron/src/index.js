@@ -78,7 +78,7 @@ if (!gotTheLock) {
         },
       },
     ]);
-    tray.setToolTip("Foody Delivery Integration");
+    tray.setToolTip("Integração BP");
     tray.setContextMenu(contextMenu);
 
     createWindow();
