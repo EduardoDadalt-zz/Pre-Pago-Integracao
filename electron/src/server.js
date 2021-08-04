@@ -167,13 +167,7 @@ const server = () => {
         "http://localhost/IntegracaoPedidosOnlineIntranet/CartaoService.svc/EnviarPedido",
         json
       );
-      database("StatusMesa").insert({
-        Mesa: rfid,
-        Terminal: 1,
-        Caixa: 1000,
-      });
       console.log(response?.data);
-      console.log(response?.data?.EnviarPedidoResult?.Sucesso);
       if (response?.data?.EnviarPedidoResult?.Sucesso) {
         const json = Object.assign(
           ...(await Promise.all([getEmUso(rfid), getSaldo(rfid)]))
@@ -207,6 +201,11 @@ const server = () => {
             Caixa: 1000,
           });
           console.log("/credito/bloquear - Sucesso");
+          setTimeout(() => {
+            database("StatusMesa")
+              .where({ Mesa: rfid, Terminal: 1, Caixa: 1000 })
+              .del();
+          }, 5000);
           return res.status(200).json({ emUso: true });
         } else return res.status(200).json({ emUso: true });
       } else throw { status: 401 };
