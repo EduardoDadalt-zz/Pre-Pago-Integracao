@@ -97,7 +97,10 @@ const server = () => {
           .then(
             (e) =>
               e.data?.ConsultarMovimentacaoCartaoResult?.Totais?.TotalConta ?? 0
-          ),
+          )
+          .catch((e) => {
+            return 0;
+          }),
       ])
         .then(([credito, mov]) => resolve({ saldo: credito - mov }))
         .catch((e) => reject(e));
