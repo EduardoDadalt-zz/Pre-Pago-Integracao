@@ -25,6 +25,14 @@ AS
   END
 `;
 
+const truncateNumber = (number) => {
+  let result = String(number).split(".");
+  if (result[1]) {
+    result[1] = result[1].substr(0, 2);
+  }
+  return Number(result.join("."));
+};
+
 const server = () => {
   const ms = 99999999;
   const database = knex({
@@ -113,7 +121,6 @@ const server = () => {
       idProdutoIntegracao,
       idConsumo,
       precoPorlitro,
-      valorTransacao,
       quantidadeExtraidaMl,
     } = req.body;
     const json = {
@@ -147,7 +154,9 @@ const server = () => {
               Observacao: "",
               ItensFracao: null,
               ItensAdicionais: [],
-              ValorTotal: valorTransacao,
+              ValorTotal: truncateNumber(
+                precoPorlitro * (quantidadeExtraidaMl / 1000)
+              ),
               ValorDescontoItem: 0,
               ValorServicoItem: 0,
               ValorDescontoComboItem: 0,
