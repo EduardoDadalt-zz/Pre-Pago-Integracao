@@ -116,6 +116,7 @@ const server = () => {
 
   app.post("/credito/salvar-consumo", async (req, res) => {
     console.log("/credito/salvar-consumo - Iniciado");
+    console.log("Req.Body: " + JSON.stringify(req.body));
     const {
       rfid,
       idProdutoIntegracao,
